@@ -54,7 +54,7 @@ def check_lesson(
 def main():
     env.read_env()
     filename = os.path.join('systemd.log')
-    logging.basicConfig(level=logging.DEBUG, filename='C:\Users\Dmitr\OneDrive\sest\logging.log', format='Уровень лога: %(levelname)s Время: %(asctime)s Сообщение: %(message)s Строка: %(lineno)d Имя файла: %(filename)s')
+    logging.basicConfig(level=logging.DEBUG, filename='C:\Users\Dmitr\OneDrive\sest\logging.log', format='Уровень лога: %(levelname)s Время: %(asctime)s Сообщение: %(message)s Строка: %(lineno)d Имя файла: %(filename)s', encoding='utf-8')
     telegram_token = env.str('TELEGRAMM_API_KEY')
     chat_id = env.str('TELEGRAMM_CHAT_ID')
     devman_token = env.str('DEVMAN_TOKEN')
