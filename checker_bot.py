@@ -1,5 +1,8 @@
 import requests
 import time
+import logging
+import os
+
 from requests.exceptions import ReadTimeout, ConnectionError
 from environs import env
 from bot import telegram_send_message
@@ -42,7 +45,7 @@ def check_lesson(
             continue
         except ConnectionError:
             print(
-                "Потреяно соедиение, будет выполнена попытка переподключения"
+                "Потеряно соедиение, будет выполнена попытка переподключения"
             )
             time.sleep(60)
             continue
@@ -50,10 +53,13 @@ def check_lesson(
 
 def main():
     env.read_env()
+    filename = os.path.join('systemd.log')
+    logging.basicConfig(level=logging.DEBUG, filename='C:\Users\Dmitr\OneDrive\sest\logging.log', format='Уровень лога: %(levelname)s Время: %(asctime)s Сообщение: %(message)s Строка: %(lineno)d Имя файла: %(filename)s')
     telegram_token = env.str('TELEGRAMM_API_KEY')
     chat_id = env.str('TELEGRAMM_CHAT_ID')
     devman_token = env.str('DEVMAN_TOKEN')
     url = "https://dvmn.org/api/long_polling/"
+    logging.info('Бот запущен')
     check_lesson(url, devman_token, telegram_token, chat_id)
 
 
