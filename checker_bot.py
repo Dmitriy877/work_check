@@ -62,21 +62,22 @@ def main():
     devman_token = env.str('DEVMAN_TOKEN')
     url = "https://dvmn.org/api/long_polling/"
     tg_bot = telegram.Bot(token=telegram_token)
+    log_bot = telegram.Bot(token=telegram_token)
 
     class TelegramLogsHandler(logging.Handler):
 
-        def __init__(self, tg_bot, chat_id):
+        def __init__(self, log_bot, chat_id):
             super().__init__()
             self.chat_id = chat_id
-            self.tg_bot = tg_bot
+            self.log_bot = log_bot
 
         def emit(self, record):
             log_entry = self.format(record)
-            self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+            self.log_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
     logger = logging.getLogger("Logger")
     logger.setLevel(logging.INFO)
-    logger.addHandler(TelegramLogsHandler(tg_bot, chat_id))
+    logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
     while True:
         try:
             logger.info('Бот работает')
