@@ -2,10 +2,12 @@ import requests
 import time
 import logging
 import os
+from logging.handlers import RotatingFileHandler
 
 from requests.exceptions import ReadTimeout, ConnectionError
 from environs import env
 from bot import telegram_send_message
+import telegram
 
 
 def get_response(url: str, devman_token, timestamp: float) -> dict:
@@ -23,9 +25,10 @@ def get_response(url: str, devman_token, timestamp: float) -> dict:
 def check_lesson(
         url: str,
         devman_token,
-        telegram_token,
+        tg_bot,
         chat_id,
-        timestamp: float = None
+        logger,
+        timestamp: float = None,
 ) -> dict:
     while True:
         try:
@@ -35,7 +38,7 @@ def check_lesson(
             if response_raw['status'] == 'found':
                 new_attempts = response_raw['new_attempts'][0]
                 telegram_send_message(
-                    telegram_token,
+                    tg_bot,
                     chat_id,
                     is_negative=new_attempts['is_negative'],
                     lesson_url=new_attempts['lesson_url'],
@@ -44,23 +47,40 @@ def check_lesson(
         except ReadTimeout:
             continue
         except ConnectionError:
-            print(
-                "Потеряно соедиение, будет выполнена попытка переподключения"
-            )
             time.sleep(60)
             continue
 
 
 def main():
     env.read_env()
-    filename = os.path.join('systemd.log')
-    logging.basicConfig(level=logging.DEBUG, filename=filename, format='Log level: %(levelname)s Time: %(asctime)s Message: %(message)s String number: %(lineno)d Filename: %(filename)s', encoding='utf-8')
+
     telegram_token = env.str('TELEGRAMM_API_KEY')
     chat_id = env.str('TELEGRAMM_CHAT_ID')
     devman_token = env.str('DEVMAN_TOKEN')
     url = "https://dvmn.org/api/long_polling/"
-    logging.info('Bot is on')
-    check_lesson(url, devman_token, telegram_token, chat_id)
+    tg_bot = telegram.Bot(token=telegram_token)
+
+    class TelegramLogsHandler(logging.Handler):
+
+        def __init__(self, tg_bot, chat_id):
+            super().__init__()
+            self.chat_id = chat_id
+            self.tg_bot = tg_bot
+
+        def emit(self, record):
+            log_entry = self.format(record)
+            self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+    logger = logging.getLogger("Logger")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TelegramLogsHandler(tg_bot, chat_id))
+
+    try:
+        logger.info('Бот работает')
+        check_lesson(url, devman_token, tg_bot, chat_id, logger)
+    except Exception as e:
+        logger.error('Бот упал с ошибкой:')
+        logger.error(e)
 
 
 if __name__ == '__main__':

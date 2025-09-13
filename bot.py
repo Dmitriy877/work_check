@@ -2,7 +2,7 @@ import telegram
 
 
 def telegram_send_message(
-    token: str,
+    tg_bot: str,
     chat_id: str,
     is_negative: bool,
     lesson_url: str,
@@ -20,5 +20,4 @@ def telegram_send_message(
             Преподавателю все понравилось, можно приступать к следующему уроку!
             Ссылка на работу {lesson_url}
         """
-    bot = telegram.Bot(token=token)
-    bot.send_message(text=text, chat_id=chat_id)
+    tg_bot.send_message(text=text, chat_id=chat_id)
