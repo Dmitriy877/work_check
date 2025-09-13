@@ -4,23 +4,46 @@
 
 ## Как установить
 
-* Python3 должен быть установлен.
-* Затем используйте "pip" (или "pip3", есть конфлик с python2) для устанвки зависимостей:
+Python3 должен быть установлен.
+
+Скачайте код:
+```python
+git clone https://github.com/Dmitriy877/work_check.git
+```
+
+Перейдите в каталог проекта:
+```python
+cd work-check
+```
+
+В каталоге проекта создайте виртуальное окружение:
+```python
+python -m venv venv
+```
+
+Активируйте его. На разных операционных системах это делается разными командами:
+
+* Windows: `.\venv\Scripts\activate`
+* MacOS/Linux: `source venv/bin/activate`
+
+
+Установите зависимости в виртуальное окружение:
+
+ "pip" (или "pip3", есть конфлик с python2) для установки зависимостей:
 ```python
 pip install -r requerements.txt
 ```
 
-* Скачайте код
-* Создайте файл .env со следующими настройками
+Определите переменные окружения. Создайте файл `.env` в каталоге `work_checker/` и положите туда такой код:
 ```python
 DEVMAN_TOKEN = "Api Token платоформы Devman"
 TELEGRAMM_API_KEY = "API ключ Телеграмм"
 TELEGRAMM_CHAT_ID = "Chat Id Телеграмм Канала куда бот постит уведомления"
 ```
-* Создать бота и получить API ключ можно используя BotFather в Телеграмм (@BotFather)
+Создать бота и получить API ключ можно используя BotFather в Телеграмм (@BotFather)
 * Рекомендуется использовать [vitrualenv/venv](https://docs.python.org/3/library/venv.html) для изоляции проекта.
 
-### Как запустить
+## Как запустить
 
 Для запуска скриптов убедитесь что вложили в папку с скриптом файл .env с вышеуказанными переменными
 
@@ -37,6 +60,11 @@ cd ./Documents/GitHub/repository_name
 
 ```python
 python checker_bot.py
+```
+или 
+
+```python
+python3 checker_bot.py
 ```
 
 * Скрипт начнет свою работу и будет постить уведомления о проверке работ
