@@ -1,6 +1,3 @@
-import telegram
-
-
 def telegram_send_message(
     tg_bot: str,
     chat_id: str,

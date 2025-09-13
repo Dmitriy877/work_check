@@ -1,8 +1,6 @@
 import requests
 import time
 import logging
-import os
-from logging.handlers import RotatingFileHandler
 
 from requests.exceptions import ReadTimeout, ConnectionError
 from environs import env
@@ -27,28 +25,20 @@ def check_lesson(
         devman_token,
         tg_bot,
         chat_id,
-        logger,
         timestamp: float = None,
-) -> dict:
-    while True:
-        try:
-            response_raw = get_response(url, devman_token, timestamp)
-            if response_raw['status'] == 'timeout':
-                timestamp = response_raw['timestamp_to_request']
-            if response_raw['status'] == 'found':
-                new_attempts = response_raw['new_attempts'][0]
-                telegram_send_message(
-                    tg_bot,
-                    chat_id,
-                    is_negative=new_attempts['is_negative'],
-                    lesson_url=new_attempts['lesson_url'],
-                    lesson_title=new_attempts['lesson_title']
-                )
-        except ReadTimeout:
-            continue
-        except ConnectionError:
-            time.sleep(60)
-            continue
+):
+    response_raw = get_response(url, devman_token, timestamp)
+    if response_raw['status'] == 'timeout':
+        timestamp = response_raw['timestamp_to_request']
+    if response_raw['status'] == 'found':
+        new_attempts = response_raw['new_attempts'][0]
+        telegram_send_message(
+            tg_bot,
+            chat_id,
+            is_negative=new_attempts['is_negative'],
+            lesson_url=new_attempts['lesson_url'],
+            lesson_title=new_attempts['lesson_title']
+        )
 
 
 def main():
@@ -74,13 +64,22 @@ def main():
     logger = logging.getLogger("Logger")
     logger.setLevel(logging.INFO)
     logger.addHandler(TelegramLogsHandler(tg_bot, chat_id))
-
-    try:
-        logger.info('Бот работает')
-        check_lesson(url, devman_token, tg_bot, chat_id, logger)
-    except Exception as e:
-        logger.error('Бот упал с ошибкой:')
-        logger.error(e)
+    while True:
+        try:
+            logger.info('Бот работает')
+            check_lesson(url, devman_token, tg_bot, chat_id, logger)
+        except ReadTimeout as e:
+            logger.error('Бот упал с ошибкой:')
+            logger.error(e)
+            continue
+        except ConnectionError as e:
+            logger.error('Бот упал с ошибкой:')
+            logger.error(e)
+            time.sleep(60)
+            continue
+        except Exception as e:
+            logger.error('Бот упал с ошибкой:')
+            logger.error(e)
 
 
 if __name__ == '__main__':
