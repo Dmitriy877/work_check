@@ -8,6 +8,18 @@ from bot import telegram_send_message
 import telegram
 
 
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, log_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.log_bot = log_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.log_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 def get_response(url: str, devman_token, timestamp: float) -> dict:
     headers = {
         "Authorization": devman_token,
@@ -61,17 +73,6 @@ def main():
     url = "https://dvmn.org/api/long_polling/"
     tg_bot = telegram.Bot(token=telegram_token)
     log_bot = telegram.Bot(token=telegram_token)
-
-    class TelegramLogsHandler(logging.Handler):
-
-        def __init__(self, log_bot, chat_id):
-            super().__init__()
-            self.chat_id = chat_id
-            self.log_bot = log_bot
-
-        def emit(self, record):
-            log_entry = self.format(record)
-            self.log_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
     logger = logging.getLogger("Logger")
     logger.setLevel(logging.INFO)
