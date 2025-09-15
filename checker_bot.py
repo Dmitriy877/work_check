@@ -15,7 +15,7 @@ def get_response(url: str, devman_token, timestamp: float) -> dict:
     payload = {
         'timestamp': timestamp,
     }
-    response = requests.get(url, headers=headers, params=payload)
+    response = requests.get(url, headers=headers, params=payload, timeout=1)
     response.raise_for_status()
     return response.json()
 
