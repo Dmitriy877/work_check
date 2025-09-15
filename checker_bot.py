@@ -43,9 +43,7 @@ def check_lesson(
                     lesson_title=new_attempts['lesson_title']
                 )
             time.sleep(60)
-        except ReadTimeout as e:
-            logger.error('Бот упал с ошибкой:')
-            logger.error(e)
+        except ReadTimeout:
             continue
         except ConnectionError as e:
             logger.error('Бот упал с ошибкой:')
