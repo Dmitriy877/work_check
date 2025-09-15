@@ -85,6 +85,7 @@ def main():
         except Exception as e:
             logger.error('Бот упал с ошибкой:')
             logger.error(e)
+            continue
 
 
 if __name__ == '__main__':
